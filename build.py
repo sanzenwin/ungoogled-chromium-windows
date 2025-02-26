@@ -223,6 +223,13 @@ def main():
             source_tree,
             None
         )
+        from dektools.file import comment_file
+
+        comment_file({source_tree / 'v8/src/inspector/v8-runtime-agent-impl.cc': [
+        """  m_inspector->debugger()->setMaxCallStackSizeToCapture(\r
+       this, V8StackTraceImpl::kDefaultMaxCallStackSizeToCapture);"""
+        ]}, '//')
+
 
     # Check if rust-toolchain folder has been populated
     HOST_CPU_IS_64BIT = sys.maxsize > 2**32
