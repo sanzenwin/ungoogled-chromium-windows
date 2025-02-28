@@ -223,6 +223,9 @@ def main():
             source_tree,
             None
         )
+        from dektools.file import read_text
+        print([read_text(source_tree / 'v8/src/inspector/v8-runtime-agent-impl.cc')])
+
 #         from dektools.file import replace_file
 #
 #         replace_file({source_tree / 'v8/src/inspector/v8-runtime-agent-impl.cc': [
@@ -264,7 +267,7 @@ def main():
         from dektools.file import comment_file
 
         comment_file({source_tree / 'v8/src/inspector/v8-runtime-agent-impl.cc': [
-        """  m_inspector->debugger()->setMaxCallStackSizeToCapture(\r
+        """  m_inspector->debugger()->setMaxCallStackSizeToCapture(
       this, V8StackTraceImpl::kDefaultMaxCallStackSizeToCapture);"""
         ]}, '//')
 
