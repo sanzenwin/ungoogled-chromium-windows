@@ -223,53 +223,45 @@ def main():
             source_tree,
             None
         )
-        from dektools.file import read_text
-        print([read_text(source_tree / 'v8/src/inspector/v8-runtime-agent-impl.cc')])
 
-#         from dektools.file import replace_file
-#
-#         replace_file({source_tree / 'v8/src/inspector/v8-runtime-agent-impl.cc': [
-#         ["""  if (m_enabled) return Response::Success();
-#   TRACE_EVENT_WITH_FLOW0(TRACE_DISABLED_BY_DEFAULT("v8.inspector"),
-#                          "V8RuntimeAgentImpl::enable", this,
-#                          TRACE_EVENT_FLAG_FLOW_OUT);
-#   m_inspector->client()->beginEnsureAllContextsInGroup(
-#       m_session->contextGroupId());
-#   m_enabled = true;
-#   m_state->setBoolean(V8RuntimeAgentImplState::runtimeEnabled, true);
-#   m_inspector->debugger()->setMaxCallStackSizeToCapture(
-#       this, V8StackTraceImpl::kDefaultMaxCallStackSizeToCapture);
-#   m_session->reportAllContexts(this);
-#   V8ConsoleMessageStorage* storage =
-#       m_inspector->ensureConsoleMessageStorage(m_session->contextGroupId());
-#   for (const auto& message : storage->messages()) {
-#     if (!reportMessage(message.get(), false)) break;
-#   }""",
-#          """  m_session->reportAllContexts(this);"""
-#          ],
-#             [
-#                 """void V8RuntimeAgentImpl::reportExecutionContextCreated(
-#     InspectedContext* context) {
-#   if (!m_enabled) return;""",
-#                 """void V8RuntimeAgentImpl::reportExecutionContextCreated(
-#     InspectedContext* context) {
-# """
-#             ],
-#             [
-#                 """void V8RuntimeAgentImpl::reportExecutionContextDestroyed(
-#     InspectedContext* context) {
-#   if (m_enabled && context->isReported(m_session->sessionId())) {""",
-#                 """void V8RuntimeAgentImpl::reportExecutionContextDestroyed(
-#     InspectedContext* context) {
-#   if (context->isReported(m_session->sessionId())) {"""
-#             ]
-#         ]})
-        from dektools.file import comment_file
+        from dektools.file import replace_file
 
-        comment_file({source_tree / 'v8/src/inspector/v8-runtime-agent-impl.cc': [
-        """  m_inspector->debugger()->setMaxCallStackSizeToCapture(
-      this, V8StackTraceImpl::kDefaultMaxCallStackSizeToCapture);"""
-        ]}, '//')
+        replace_file({source_tree / 'v8/src/inspector/v8-runtime-agent-impl.cc': [
+        ["""  if (m_enabled) return Response::Success();
+  TRACE_EVENT_WITH_FLOW0(TRACE_DISABLED_BY_DEFAULT("v8.inspector"),
+                         "V8RuntimeAgentImpl::enable", this,
+                         TRACE_EVENT_FLAG_FLOW_OUT);
+  m_inspector->client()->beginEnsureAllContextsInGroup(
+      m_session->contextGroupId());
+  m_enabled = true;
+  m_state->setBoolean(V8RuntimeAgentImplState::runtimeEnabled, true);
+  m_inspector->debugger()->setMaxCallStackSizeToCapture(
+      this, V8StackTraceImpl::kDefaultMaxCallStackSizeToCapture);
+  m_session->reportAllContexts(this);
+  V8ConsoleMessageStorage* storage =
+      m_inspector->ensureConsoleMessageStorage(m_session->contextGroupId());
+  for (const auto& message : storage->messages()) {
+    if (!reportMessage(message.get(), false)) break;
+  }""",
+         """  m_session->reportAllContexts(this);"""
+         ],
+            [
+                """void V8RuntimeAgentImpl::reportExecutionContextCreated(
+    InspectedContext* context) {
+  if (!m_enabled) return;""",
+                """void V8RuntimeAgentImpl::reportExecutionContextCreated(
+    InspectedContext* context) {
+"""
+            ],
+            [
+                """void V8RuntimeAgentImpl::reportExecutionContextDestroyed(
+    InspectedContext* context) {
+  if (m_enabled && context->isReported(m_session->sessionId())) {""",
+                """void V8RuntimeAgentImpl::reportExecutionContextDestroyed(
+    InspectedContext* context) {
+  if (context->isReported(m_session->sessionId())) {"""
+            ]
+        ]})
 
 
 
