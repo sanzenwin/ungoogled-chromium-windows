@@ -250,7 +250,7 @@ def main():
   m_inspector->client()->beginEnsureAllContextsInGroup(
       m_session->contextGroupId());
   //m_enabled = true;
-  m_state->setBoolean(V8RuntimeAgentImplState::runtimeEnabled, true);
+  //m_state->setBoolean(V8RuntimeAgentImplState::runtimeEnabled, true);
   m_inspector->debugger()->setMaxCallStackSizeToCapture(
       this, V8StackTraceImpl::kDefaultMaxCallStackSizeToCapture);
   m_session->reportAllContexts(this);
