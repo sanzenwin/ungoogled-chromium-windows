@@ -251,8 +251,8 @@ def main():
       m_session->contextGroupId());
   //m_enabled = true;
   //m_state->setBoolean(V8RuntimeAgentImplState::runtimeEnabled, true);
-  m_inspector->debugger()->setMaxCallStackSizeToCapture(
-      this, V8StackTraceImpl::kDefaultMaxCallStackSizeToCapture);
+  //m_inspector->debugger()->setMaxCallStackSizeToCapture(
+  //    this, V8StackTraceImpl::kDefaultMaxCallStackSizeToCapture);
   m_session->reportAllContexts(this);
   V8ConsoleMessageStorage* storage =
       m_inspector->ensureConsoleMessageStorage(m_session->contextGroupId());
