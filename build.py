@@ -243,7 +243,22 @@ def main():
   for (const auto& message : storage->messages()) {
     if (!reportMessage(message.get(), false)) break;
   }""",
-         """  m_session->reportAllContexts(this);"""
+         """  if (m_enabled) return Response::Success();
+  TRACE_EVENT_WITH_FLOW0(TRACE_DISABLED_BY_DEFAULT("v8.inspector"),
+                         "V8RuntimeAgentImpl::enable", this,
+                         TRACE_EVENT_FLAG_FLOW_OUT);
+  m_inspector->client()->beginEnsureAllContextsInGroup(
+      m_session->contextGroupId());
+  //m_enabled = true;
+  m_state->setBoolean(V8RuntimeAgentImplState::runtimeEnabled, true);
+  m_inspector->debugger()->setMaxCallStackSizeToCapture(
+      this, V8StackTraceImpl::kDefaultMaxCallStackSizeToCapture);
+  m_session->reportAllContexts(this);
+  V8ConsoleMessageStorage* storage =
+      m_inspector->ensureConsoleMessageStorage(m_session->contextGroupId());
+  for (const auto& message : storage->messages()) {
+    if (!reportMessage(message.get(), false)) break;
+  }"""
          ],
             [
                 """void V8RuntimeAgentImpl::reportExecutionContextCreated(
