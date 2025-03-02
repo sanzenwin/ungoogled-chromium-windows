@@ -254,8 +254,8 @@ def main():
   //m_inspector->debugger()->setMaxCallStackSizeToCapture(
   //    this, V8StackTraceImpl::kDefaultMaxCallStackSizeToCapture);
   m_session->reportAllContexts(this);
-  V8ConsoleMessageStorage* storage =
-      m_inspector->ensureConsoleMessageStorage(m_session->contextGroupId());
+  //V8ConsoleMessageStorage* storage =
+  //    m_inspector->ensureConsoleMessageStorage(m_session->contextGroupId());
   for (const auto& message : storage->messages()) {
     if (!reportMessage(message.get(), false)) break;
   }"""
