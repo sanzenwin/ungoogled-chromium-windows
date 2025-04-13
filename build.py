@@ -203,17 +203,17 @@ def main():
 
         # Apply patches
         # First, ungoogled-chromium-patches
-        patches.apply_patches(
-            patches.generate_patches_from_series(_ROOT_DIR / 'ungoogled-chromium' / 'patches', resolve=True),
-            source_tree,
-            patch_bin_path=(source_tree / _PATCH_BIN_RELPATH)
-        )
-        # Then Windows-specific patches
-        patches.apply_patches(
-            patches.generate_patches_from_series(_ROOT_DIR / 'patches', resolve=True),
-            source_tree,
-            patch_bin_path=(source_tree / _PATCH_BIN_RELPATH)
-        )
+        # patches.apply_patches(
+        #     patches.generate_patches_from_series(_ROOT_DIR / 'ungoogled-chromium' / 'patches', resolve=True),
+        #     source_tree,
+        #     patch_bin_path=(source_tree / _PATCH_BIN_RELPATH)
+        # )
+        # # Then Windows-specific patches
+        # patches.apply_patches(
+        #     patches.generate_patches_from_series(_ROOT_DIR / 'patches', resolve=True),
+        #     source_tree,
+        #     patch_bin_path=(source_tree / _PATCH_BIN_RELPATH)
+        # )
 
         # Substitute domains
         domain_substitution_list = (_ROOT_DIR / 'ungoogled-chromium' / 'domain_substitution.list') if args.tarball else (_ROOT_DIR  / 'domain_substitution.list')
@@ -223,6 +223,62 @@ def main():
             source_tree,
             None
         )
+
+        from dektools.file import replace_file
+
+        replace_file({source_tree / 'v8/src/inspector/v8-runtime-agent-impl.cc': [
+        ["""  if (m_enabled) return Response::Success();
+  TRACE_EVENT_WITH_FLOW0(TRACE_DISABLED_BY_DEFAULT("v8.inspector"),
+                         "V8RuntimeAgentImpl::enable", this,
+                         TRACE_EVENT_FLAG_FLOW_OUT);
+  m_inspector->client()->beginEnsureAllContextsInGroup(
+      m_session->contextGroupId());
+  m_enabled = true;
+  m_state->setBoolean(V8RuntimeAgentImplState::runtimeEnabled, true);
+  m_inspector->debugger()->setMaxCallStackSizeToCapture(
+      this, V8StackTraceImpl::kDefaultMaxCallStackSizeToCapture);
+  m_session->reportAllContexts(this);
+  V8ConsoleMessageStorage* storage =
+      m_inspector->ensureConsoleMessageStorage(m_session->contextGroupId());
+  for (const auto& message : storage->messages()) {
+    if (!reportMessage(message.get(), false)) break;
+  }""",
+         """  if (m_enabled) return Response::Success();
+  TRACE_EVENT_WITH_FLOW0(TRACE_DISABLED_BY_DEFAULT("v8.inspector"),
+                         "V8RuntimeAgentImpl::enable", this,
+                         TRACE_EVENT_FLAG_FLOW_OUT);
+  m_inspector->client()->beginEnsureAllContextsInGroup(
+      m_session->contextGroupId());
+  //m_enabled = true;
+  m_state->setBoolean(V8RuntimeAgentImplState::runtimeEnabled, true);
+  m_inspector->debugger()->setMaxCallStackSizeToCapture(
+      this, V8StackTraceImpl::kDefaultMaxCallStackSizeToCapture);
+  m_session->reportAllContexts(this);
+  V8ConsoleMessageStorage* storage =
+      m_inspector->ensureConsoleMessageStorage(m_session->contextGroupId());
+  for (const auto& message : storage->messages()) {
+    if (!reportMessage(message.get(), false)) break;
+  }"""
+         ],
+            [
+                """void V8RuntimeAgentImpl::reportExecutionContextCreated(
+    InspectedContext* context) {
+  if (!m_enabled) return;""",
+                """void V8RuntimeAgentImpl::reportExecutionContextCreated(
+    InspectedContext* context) {
+"""
+            ],
+            [
+                """void V8RuntimeAgentImpl::reportExecutionContextDestroyed(
+    InspectedContext* context) {
+  if (m_enabled && context->isReported(m_session->sessionId())) {""",
+                """void V8RuntimeAgentImpl::reportExecutionContextDestroyed(
+    InspectedContext* context) {
+  if (context->isReported(m_session->sessionId())) {"""
+            ]
+        ]})
+
+
 
     # Check if rust-toolchain folder has been populated
     HOST_CPU_IS_64BIT = sys.maxsize > 2**32
